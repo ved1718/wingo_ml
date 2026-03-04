@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WinGo 1M Predictor</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>WinGo 1M Predictor (Educational)</h1>
+      <p>
+        Uses last 50 scraped periods and a simple logistic model to estimate the next <b>color</b> and
+        <b>size</b>.
+      </p>
+
+      <form id="predictForm">
+        <label>
+          WinGo URL
+          <input id="url" type="url" value="{{ default_url }}" required />
+        </label>
+        <label>
+          History count
+          <input id="limit" type="number" min="20" max="200" value="50" />
+        </label>
+        <button type="submit">Fetch + Predict</button>
+      </form>
+
+      <section id="status"></section>
+      <section id="result"></section>
+    </main>
+
+    <script>
+      const form = document.getElementById('predictForm');
+      const statusEl = document.getElementById('status');
+      const resultEl = document.getElementById('result');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusEl.textContent = 'Loading latest periods and training model...';
+        resultEl.innerHTML = '';
+
+        const body = {
+          url: document.getElementById('url').value,
+          limit: Number(document.getElementById('limit').value),
+        };
+
+        const res = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const json = await res.json();
+
+        if (!json.ok) {
+          statusEl.textContent = `Error: ${json.error}`;
+          return;
+        }
+
+        statusEl.textContent = `Loaded ${json.prediction.samples_used} periods.`;
+        resultEl.innerHTML = `
+          <div class="cards">
+            <article class="card">
+              <h3>Next Color</h3>
+              <p class="value">${json.prediction.next_color.label}</p>
+              <small>confidence ${(json.prediction.next_color.probability * 100).toFixed(1)}%</small>
+            </article>
+            <article class="card">
+              <h3>Next Size</h3>
+              <p class="value">${json.prediction.next_size.label}</p>
+              <small>confidence ${(json.prediction.next_size.probability * 100).toFixed(1)}%</small>
+            </article>
+          </div>
+          <details>
+            <summary>Show recent periods</summary>
+            <pre>${JSON.stringify(json.history, null, 2)}</pre>
+          </details>
+        `;
+      });
+    </script>
+  </body>
+</html>
