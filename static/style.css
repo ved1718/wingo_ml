@@ -1,0 +1,55 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: #f9fafb;
+  margin: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+input,
+button {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #374151;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.value {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+pre {
+  background: #030712;
+  padding: 0.8rem;
+  overflow: auto;
+}
